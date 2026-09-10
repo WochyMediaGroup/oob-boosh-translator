@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>oob boosh translator</title>
+</head>
+<body>
+    <h1>Oob Boosh 'Translator'</h1>
+    <textarea id="originalText" placeholder="Enter text to translate..."></textarea>
+    <br>
+    <button id="translateButton">Translate</button>
+    <h2>Translated Text</h2>
+    <div id="translatedText"></div>
+        <script>
+        let originalText = "";
+        let translatedText = "";
+        const input = document.getElementById("originalText");
+        const translateButton = document.getElementById("translateButton");
+        const output = document.getElementById("translatedText");
+        function applyRules1And2And4(text) {
+            let result = "";
+            const vowels = "aeiou";
+            for (let i = 0; i < text.length; i++) {
+                const character = text[i];
+                const lowerCharacter = character.toLowerCase();
+                if (vowels.includes(lowerCharacter)) {
+                    const previous = text[i - 1]?.toLowerCase();
+                    const previousIsVowel =
+                        vowels.includes(previous);
+                    if (!previousIsVowel) {
+                        let vowelGroup = "";
+                        let j = i;
+                        while (
+                            j < text.length &&
+                            vowels.includes(text[j].toLowerCase())
+                        ) {
+                            vowelGroup += text[j].toLowerCase();
+                            j++;
+                        }
+                        if (vowelGroup.length >= 2) {
+                            for (let k = 0; k < vowelGroup.length; k++) {
+                                const realVowel = vowelGroup[k];
+                                let convertedVowel;
+                                switch (realVowel) {
+                                    case "a":
+                                        convertedVowel = "i";
+                                        break;
+                                    case "e":
+                                        convertedVowel = "u";
+                                        break;
+                                    case "i":
+                                        convertedVowel = "o";
+                                        break;
+                                    case "o":
+                                        convertedVowel = "e";
+                                        break;
+                                    case "u":
+                                        convertedVowel = "a";
+                                        break;
+                                }
+                                result += convertedVowel;
+                                if (k < vowelGroup.length - 1) {
+                                    const nextRealVowel =
+                                        vowelGroup[k + 1];
+                                    let nextConvertedVowel;
+                                    switch (nextRealVowel) {
+                                        case "a":
+                                            nextConvertedVowel = "i";
+                                            break;
+                                        case "e":
+                                            nextConvertedVowel = "u";
+                                            break;
+                                        case "i":
+                                            nextConvertedVowel = "o";
+                                            break;
+                                        case "o":
+                                            nextConvertedVowel = "e";
+                                            break;
+                                        case "u":
+                                            nextConvertedVowel = "a";
+                                            break;
+                                    }
+                                    if (
+                                        convertedVowel === "o" ||
+                                        nextConvertedVowel === "o"
+                                    ) {
+                                        result += "w";
+                                    }
+                                    else {
+                                        result += "b";
+                                    }
+                                }
+                            }
+                            i = j - 1;
+                            continue;
+                        }
+                    }
+                }
+                if (
+                    lowerCharacter === "o" &&
+                    text.substring(i, i + 3).toLowerCase() === "owe"
+                ) {
+                    result += "y";
+                    i += 2;
+                    continue;
+                }
+                if (lowerCharacter === "b") {
+                    result += "2";
+                    continue;
+                }
+                if (lowerCharacter === "y") {
+                    result += "ae";
+                    continue;
+                }
+                if (lowerCharacter === "r") {
+                    result += "t";
+                    continue;
+                }
+                if (lowerCharacter === "t") {
+                    result += "r";
+                    continue;
+                }
+                if (vowels.includes(lowerCharacter)) {
+                    const previous = text[i - 1]?.toLowerCase();
+                    const next = text[i + 1]?.toLowerCase();
+                    const previousIsVowel =
+                        vowels.includes(previous);
+                    const nextIsVowel =
+                        vowels.includes(next);
+                    if (!previousIsVowel && !nextIsVowel) {
+                        switch (lowerCharacter) {
+                            case "a":
+                                result += "oob";
+                                break;
+                            case "e":
+                                result += "obo";
+                                break;
+                            case "i":
+                                result += "boo";
+                                break;
+                            case "o":
+                                result += "ob";
+                                break;
+                            case "u":
+                                result += "bo";
+                                break;
+                        }
+                        continue;
+                    }
+                }
+                result += character;
+            }
+            return result;
+        }
+        function applyRule3(text) {
+            let result = "";
+            for (let i = 0; i < text.length; i++) {
+                const current = text[i];
+                if (current === "b") {
+                    const previous = text[i - 1];
+                    const next = text[i + 1];
+                    if (
+                        next &&
+                        !isVowelUnit(text, i + 1)
+                    ) {
+                        result += "bi";
+                        continue;
+                    }
+
+                    if (
+                        previous &&
+                        !isVowelUnit(text, i - 1)
+                    ) {
+                        result += "ib";
+                        continue;
+                    }
+                }
+                if (current === "t") {
+                    const previous = text[i - 1];
+                    const next = text[i + 1];
+                    if (
+                        next &&
+                        !isVowelUnit(text, i + 1) &&
+                        next !== "s" &&
+                        next !== "t" &&
+                        next !== "b" &&
+                        !(next === "a" && text[i + 2] === "e")
+                    ) {
+                        result += "te";
+                        continue;
+                    }
+                    if (
+                        previous &&
+                        !isVowelUnit(text, i - 1) &&
+                        previous !== "s" &&
+                        previous !== "t" &&
+                        previous !== "b"
+                    ) {
+                        result += "et";
+                        continue;
+                    }
+                    result += "t";
+                    continue;
+                }
+                if (current === "2") {
+                    const next = text[i + 1];
+                    result += "2";
+                    if (
+                        next &&
+                        !isVowelUnit(text, i + 1) &&
+                        !(next === "a" && text[i + 2] === "e")
+                    ) {
+                        result += "e";
+                    }
+                    continue;
+                }
+                if (
+                    current === "a" &&
+                    text[i + 1] === "e"
+                ) {
+                    result += "ae";
+
+                    i++;
+
+                    continue;
+                }
+                result += current;
+            }
+            return result;
+        }
+        function isVowelUnit(text, index) {
+            const character = text[index];
+            if (
+                character === "a" &&
+                text[index + 1] === "e"
+            ) {
+                return true;
+            }
+            return "aeiou".includes(
+                character?.toLowerCase()
+            );
+        }
+        function translate(text) {
+            let result = applyRules1And2And4(text);
+            result = applyRule3(result);
+            return result;
+        }
+        translateButton.addEventListener("click", function () {
+            originalText = input.value;
+            translatedText = translate(originalText);
+            output.textContent = translatedText;
+        });
+    </script>
+</body>
+</html>
